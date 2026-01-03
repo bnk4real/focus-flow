@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTimer } from './useTimer';
 import { motion } from 'framer-motion';
 import MusicPlayer from '../music/MusicPlayer';
+import { useTimerContext } from '../../contexts/TimerContext';
 
 const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -29,6 +30,8 @@ export default function Timer() {
     const [showTimeUpDialog, setShowTimeUpDialog] = useState(false);
     const [customMinutes, setCustomMinutes] = useState<number>(25);
     const [animationStyle, setAnimationStyle] = useState<AnimationStyle>('circle');
+
+    const { timerState: globalTimerState, updateTimerState } = useTimerContext();
 
     const { timeLeft, isRunning, mode, start, pause, reset, switchMode, setCustomTime, customDuration } = useTimer(() => {
         // onComplete callback from the hook
@@ -69,6 +72,25 @@ export default function Timer() {
             playNotificationSound();
         }
     }, [showTimeUpDialog]);
+
+    const prevIsRunningRef = useRef(isRunning);
+
+    // Update global timer state only when timer starts/stops or mode changes
+    useEffect(() => {
+        const prevIsRunning = prevIsRunningRef.current;
+        const isStarting = isRunning && !prevIsRunning;
+        const isStopping = !isRunning && prevIsRunning;
+
+        if (isStarting || isStopping || mode !== globalTimerState.mode) {
+            updateTimerState({
+                isRunning,
+                mode,
+                timeLeft: isStarting ? timeLeft : undefined,
+            });
+        }
+
+        prevIsRunningRef.current = isRunning;
+    }, [isRunning, mode, timeLeft, updateTimerState, globalTimerState.mode]);
 
     const handleDismissNotification = () => {
         setShowTimeUpDialog(false);
@@ -119,6 +141,19 @@ export default function Timer() {
     const handleReset = () => {
         reset();
         setShowMusicPlayer(false); // Close music player when resetting
+    };
+
+    const renderAnimation = () => {
+        switch (animationStyle) {
+            case 'coffee':
+                return <CoffeeAnimation />;
+            case 'progressbar':
+                return <ProgressBarAnimation />;
+            case 'water':
+                return <WaterAnimation />;
+            default:
+                return <CircleAnimation />;
+        }
     };
 
     // Animation Components
@@ -263,141 +298,168 @@ export default function Timer() {
         </div>
     );
 
-    const renderAnimation = () => {
-        switch (animationStyle) {
-            case 'coffee':
-                return <CoffeeAnimation />;
-            case 'progressbar':
-                return <ProgressBarAnimation />;
-            case 'water':
-                return <WaterAnimation />;
-            default:
-                return <CircleAnimation />;
-        }
-    };
-
     return (
-        <div className="flex flex-col items-center p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-100 dark:border-gray-700" suppressHydrationWarning>
-            <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Pomodoro Timer</h2>
-
-            {/* Animation Style Selector */}
-            <div className="flex gap-1 mb-4 p-2 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                <button
-                    onClick={() => setAnimationStyle('circle')}
-                    className={`px-3 py-1 rounded text-sm transition-colors ${
-                        animationStyle === 'circle'
-                            ? 'bg-blue-500 text-white'
-                            : 'text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                    }`}
-                >
-                    ●
-                </button>
-                <button
-                    onClick={() => setAnimationStyle('coffee')}
-                    className={`px-3 py-1 rounded text-sm transition-colors ${
-                        animationStyle === 'coffee'
-                            ? 'bg-blue-500 text-white'
-                            : 'text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                    }`}
-                >
-                    ☕
-                </button>
-                <button
-                    onClick={() => setAnimationStyle('progressbar')}
-                    className={`px-3 py-1 rounded text-sm transition-colors ${
-                        animationStyle === 'progressbar'
-                            ? 'bg-blue-500 text-white'
-                            : 'text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                    }`}
-                >
-                    ▬
-                </button>
-                <button
-                    onClick={() => setAnimationStyle('water')}
-                    className={`px-3 py-1 rounded text-sm transition-colors ${
-                        animationStyle === 'water'
-                            ? 'bg-blue-500 text-white'
-                            : 'text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                    }`}
-                >
-                    🥤
-                </button>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden h-full flex flex-col">
+            {/* Header */}
+            <div className="bg-gray-100 dark:bg-gray-800 p-6 border-b border-gray-200 dark:border-gray-700">
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                        <div className="p-2 bg-gray-200 dark:bg-gray-700 rounded-lg mr-3">
+                            <svg className="w-6 h-6 text-gray-700 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Focus Timer</h2>
+                            <p className="text-gray-600 dark:text-gray-300 text-sm">Stay productive and focused</p>
+                        </div>
+                    </div>
+                    <div className="text-right">
+                        <div className="text-2xl font-mono font-bold text-gray-900 dark:text-white">{formatTime(timeLeft)}</div>
+                        <div className="text-sm text-gray-600 dark:text-gray-300 capitalize">{mode.replace(/([A-Z])/g, ' $1').trim()}</div>
+                    </div>
+                </div>
             </div>
 
-            {renderAnimation()}
-            
-            {/* Timer Controls */}
-            <div className="flex gap-2 mb-4 justify-center">
-                <button
-                    onClick={handleStartClick}
-                    className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded transition-colors"
-                >
-                    {isRunning ? 'Pause' : 'Start'}
-                </button>
-                <button
-                    onClick={handleReset}
-                    className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded transition-colors"
-                >
-                    Reset
-                </button>
-            </div>
+            {/* Main Content */}
+            <div className="p-6 flex-grow">
+                {/* Animation Style Selector */}
+                <div className="flex justify-center gap-2 mb-6">
+                    {(['circle', 'coffee', 'progressbar', 'water'] as AnimationStyle[]).map((style) => (
+                        <button
+                            key={style}
+                            onClick={() => setAnimationStyle(style)}
+                            className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 ${animationStyle === style
+                                ? 'bg-blue-600 text-white'
+                                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                                }`}
+                        >
+                            {style === 'circle' && (
+                                <>
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <circle cx="12" cy="12" r="10" />
+                                    </svg>
+                                    Circle
+                                </>
+                            )}
+                            {style === 'coffee' && (
+                                <>
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 2l3 3-3 3-3-3 3-3zM12 9v6m-6-3h12" />
+                                    </svg>
+                                    Coffee
+                                </>
+                            )}
+                            {style === 'progressbar' && (
+                                <>
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                    </svg>
+                                    Progress
+                                </>
+                            )}
+                            {style === 'water' && (
+                                <>
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                    </svg>
+                                    Water
+                                </>
+                            )}
+                        </button>
+                    ))}
+                </div>
 
-            {/* Mode Selection */}
-            <div className="flex flex-wrap gap-2 mb-4 justify-center">
-                <button
-                    onClick={() => switchMode('focus')}
-                    className={`px-4 py-2 rounded transition-colors ${mode === 'focus'
-                            ? 'bg-blue-500 text-white'
-                            : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
-                        }`}
-                >
-                    Focus
-                </button>
-                <button
-                    onClick={() => switchMode('shortBreak')}
-                    className={`px-4 py-2 rounded transition-colors ${mode === 'shortBreak'
-                            ? 'bg-blue-500 text-white'
-                            : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
-                        }`}
-                >
-                    Short Break
-                </button>
-                <button
-                    onClick={() => switchMode('longBreak')}
-                    className={`px-4 py-2 rounded transition-colors ${mode === 'longBreak'
-                            ? 'bg-blue-500 text-white'
-                            : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
-                        }`}
-                >
-                    Long Break
-                </button>
-            </div>
+                {/* Animated Timer Display */}
+                <div className="flex justify-center mb-6">
+                    {renderAnimation()}
+                </div>
+                {/* Quick Preset Buttons */}
+                <div className="grid grid-cols-3 gap-3 mb-6">
+                    <button
+                        onClick={() => {
+                            switchMode('focus');
+                            reset();
+                        }}
+                        className="p-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-all duration-200"
+                    >
+                        <div className="text-xs opacity-90">Focus</div>
+                        <div className="text-lg font-bold">25m</div>
+                    </button>
+                    <button
+                        onClick={() => {
+                            switchMode('shortBreak');
+                            reset();
+                        }}
+                        className="p-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-all duration-200"
+                    >
+                        <div className="text-xs opacity-90">Break</div>
+                        <div className="text-lg font-bold">5m</div>
+                    </button>
+                    <button
+                        onClick={() => {
+                            switchMode('longBreak');
+                            reset();
+                        }}
+                        className="p-3 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-medium transition-all duration-200"
+                    >
+                        <div className="text-xs opacity-90">Long</div>
+                        <div className="text-lg font-bold">15m</div>
+                    </button>
+                </div>
 
-            {/* Custom Duration Input */}
-            <div className="flex items-center gap-2 mb-4 justify-center">
-                <input
-                    type="number"
-                    min={1}
-                    value={customMinutes}
-                    onChange={(e) => setCustomMinutes(Number(e.target.value))}
-                    className="w-20 px-2 py-1 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-700 text-sm text-gray-800 dark:text-gray-200"
-                    aria-label="Custom minutes"
-                />
-                <button
-                    onClick={applyCustomMinutes}
-                    className="px-3 py-1 rounded bg-indigo-500 hover:bg-indigo-600 text-white text-sm"
-                >
-                    Set Custom
-                </button>
-            </div>
+                {/* Custom Minutes Input */}
+                <div className="mb-6">
+                    <div className="flex gap-3 items-center">
+                        <input
+                            type="number"
+                            min="1"
+                            max="120"
+                            value={customMinutes}
+                            onChange={(e) => setCustomMinutes(Number(e.target.value))}
+                            placeholder="Custom minutes"
+                            className="flex-1 px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                        />
+                        <button
+                            onClick={() => {
+                                applyCustomMinutes();
+                                reset();
+                            }}
+                            className="px-6 py-3 bg-gray-900 hover:bg-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 text-white rounded-lg font-semibold transition-all duration-200"
+                        >
+                            <svg className="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Set Custom
+                        </button>
+                    </div>
+                </div>
 
-            {/* Music Player Toggle */}
-            <div className="mb-4">
+                {/* Timer Controls */}
+                <div className="flex gap-2 mb-4 justify-center">
+                    <button
+                        onClick={handleStartClick}
+                        className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
+                    >
+                        {isRunning ? 'Pause' : 'Start'}
+                    </button>
+                    <button
+                        onClick={handleReset}
+                        className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors"
+                    >
+                        Reset
+                    </button>
+                </div>
+
+                {/* Music Toggle */}
                 <button
                     onClick={() => setShowMusicPlayer(!showMusicPlayer)}
-                    className="px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded transition-colors"
+                    className="w-full py-3 px-4 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium transition-all duration-200 border border-gray-200 dark:border-gray-600"
                 >
-                    {showMusicPlayer ? 'Hide Music' : 'Show Music'}
+                    <svg className="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                    </svg>
+                    {showMusicPlayer ? 'Hide Focus Music' : 'Show Focus Music'}
                 </button>
             </div>
 

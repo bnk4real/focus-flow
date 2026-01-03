@@ -3,14 +3,20 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTimerContext } from '../../contexts/TimerContext';
 
 export default function Time() {
-    const [currentTime, setCurrentTime] = useState<string>('');
+    const [currentTime, setCurrentTime] = useState<string>(() => 
+        new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+    );
     const [location, setLocation] = useState<string>('');
+    const { timerState } = useTimerContext();
 
     useEffect(() => {
         const updateTime = () => {
-            setCurrentTime(new Date().toLocaleTimeString());
+            const timeString = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            setCurrentTime(timeString);
+            document.title = `Focus Flow - ${timeString}`;
         };
 
         updateTime();
@@ -39,15 +45,37 @@ export default function Time() {
         return () => clearInterval(interval);
     }, []);
 
+    // Calculate end time
+    const getEndTime = () => {
+        if (timerState.isRunning && timerState.endTime) {
+            return timerState.endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+        return '--';
+    };
+
     return (
-        <div className="text-center mb-8" suppressHydrationWarning>
-            <div className="inline-block p-4 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Current Time</h2>
-                <p className="text-3xl font-mono font-bold text-gray-800 dark:text-gray-200">
+        <div className="inline-flex items-center gap-4 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+            {/* Current Time */}
+            <div className="text-center">
+                <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Current Time</h3>
+                <p className="text-xl md:text-2xl font-mono font-bold text-gray-900 dark:text-white">
                     {currentTime}
                 </p>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-                    Location: {location}
+                {location && (
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        {location}
+                    </p>
+                )}
+            </div>
+
+            {/* Divider */}
+            <div className="hidden sm:block w-px h-12 bg-gray-300 dark:bg-gray-600"></div>
+
+            {/* End Time */}
+            <div className="text-center">
+                <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Session Ends</h3>
+                <p className="text-xl md:text-2xl font-mono font-bold text-gray-900 dark:text-white">
+                    {getEndTime()}
                 </p>
             </div>
         </div>

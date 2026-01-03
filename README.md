@@ -3,6 +3,7 @@
 A modern, feature-rich productivity dashboard designed to help you stay focused and organized. Built with Next.js, TypeScript, and Tailwind CSS.
 
 ![Focus Flow](https://img.shields.io/badge/Focus%20Flow-Productivity%20Dashboard-blue?style=for-the-badge)
+![Version](https://img.shields.io/badge/Version-0.2.0-green?style=flat-square)
 ![Next.js](https://img.shields.io/badge/Next.js-16.1.1-black?style=flat-square)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=flat-square)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4+-blue?style=flat-square)
@@ -19,22 +20,22 @@ A modern, feature-rich productivity dashboard designed to help you stay focused 
 - **Custom Duration**: Set any timer duration you need
 - **Smart Notifications**: Audio alerts when timer completes
 - **Seamless Mode Switching**: Switch between modes without losing progress
+- **Performance Optimized**: Smooth animations with no rendering issues
 
-### 📝 **Smart Todo List**
+### 📝 **Enhanced Task Manager**
 - **Persistent Storage**: Tasks saved automatically to localStorage
-- **Task Management**: Add, complete, and delete tasks
-- **Visual Feedback**: Smooth animations for task interactions
-- **Cross-session Persistence**: Your tasks remain across browser sessions
+- **Task Management**: Add, complete, and delete tasks with smooth animations
+- **Category Organization**: Organize tasks by Work, Personal, Health, or Other
+- **Priority Levels**: Set Low, Medium, or High priority with visual indicators
+- **Smart Filtering**: Filter tasks by status (All, Active, Completed) and category
+- **Task Statistics**: Live counters for active, completed, and total tasks
+- **Cross-session Persistence**: Your tasks and organization remain across browser sessions
 
-### 📅 **Interactive Calendar**
-- **Date Selection**: Click to select dates
-- **Clean Interface**: Modern calendar design
-- **Future-ready**: Built for event integration
-
-### 🕐 **Time & Location Display**
+### � **Time & Location Display**
 - **Live Clock**: Real-time time updates every second
 - **Geolocation**: Automatic location detection
 - **Timezone Aware**: Displays local time accurately
+- **Clean Design**: Minimal, professional time display
 
 ### 🎵 **Focus Music Player**
 - **YouTube Integration**: Play focus music from YouTube
@@ -42,10 +43,26 @@ A modern, feature-rich productivity dashboard designed to help you stay focused 
 - **Volume Control**: Adjust audio levels
 - **Playlist Support**: Queue multiple tracks
 
-### 🌙 **Theme System**
-- **Dark/Light Mode**: Automatic system preference detection
-- **Smooth Transitions**: Elegant theme switching animations
-- **Accessibility**: High contrast ratios for readability
+### 🌙 **Modern Theme System**
+- **Dark/Light Mode**: Automatic system preference detection with manual override
+- **Neutral Styling**: Clean, professional design with minimal color usage
+- **Consistent Icons**: Heroicons library for uniform, scalable iconography
+- **Smooth Transitions**: Elegant theme switching and interaction animations
+- **Equal Card Heights**: Balanced layout with consistent component sizing
+- **Fullscreen Mode**: Immersive distraction-free experience
+- **Accessibility**: High contrast ratios and screen reader friendly
+
+## 🆕 Recent Updates
+
+### v0.2.0 - Enhanced Productivity Features
+- ✨ **Enhanced Task Manager**: Added task categories (Work, Personal, Health, Other) and priority levels (Low, Medium, High)
+- 🎨 **UI/UX Improvements**: Replaced colorful gradients with neutral styling for a more professional look
+- 🔄 **Icon System**: Migrated from emoji icons to Heroicons library for consistency and scalability
+- 📏 **Layout Optimization**: Implemented equal card heights for better visual balance
+- �️ **Fullscreen Mode**: Added fullscreen toggle for distraction-free focus sessions
+- �🐛 **Bug Fixes**: Fixed timer animations, removed duplicate displays, resolved infinite re-render issues
+- ⚡ **Performance**: Optimized component rendering and state management
+- 📱 **Responsive Design**: Improved mobile and tablet layouts
 
 ## 🚀 Getting Started
 
@@ -93,9 +110,10 @@ A modern, feature-rich productivity dashboard designed to help you stay focused 
 - **Styling**: [Tailwind CSS 3.4+](https://tailwindcss.com/)
 - **Animations**: [Framer Motion](https://www.framer.com/motion/)
 - **Theme Management**: [next-themes](https://github.com/pacocoursey/next-themes)
-- **Calendar**: [react-calendar](https://github.com/wojtekmaj/react-calendar)
 - **Date Handling**: [date-fns](https://date-fns.org/)
-- **Icons**: Heroicons (via Tailwind CSS)
+- **Icons**: [Heroicons](https://heroicons.com/) (via Tailwind CSS)
+- **State Management**: React Context API
+- **SEO**: Next.js Metadata API, JSON-LD structured data, PWA manifest
 
 ## 📁 Project Structure
 
@@ -103,12 +121,12 @@ A modern, feature-rich productivity dashboard designed to help you stay focused 
 focus-flow/
 ├── app/
 │   ├── components/
-│   │   ├── calendar/          # Calendar component
 │   │   ├── music/            # Music player with YouTube integration
 │   │   ├── navbar/           # Navigation with theme toggle
 │   │   ├── time/             # Time and location display
 │   │   ├── timer/            # Pomodoro timer with animations
-│   │   └── todo/             # Todo list with persistence
+│   │   └── todo/             # Enhanced todo list with categories & priorities
+│   ├── contexts/             # React contexts for state management
 │   ├── globals.css           # Global styles and Tailwind imports
 │   ├── layout.tsx            # Root layout with theme provider
 │   └── page.tsx              # Main dashboard page
@@ -128,15 +146,24 @@ focus-flow/
 4. **Start/Pause**: Use the Start button to begin timing
 5. **Music Integration**: Click "Show Music" to add background focus music
 
-### Todo Management
+### Task Management
 1. **Add Tasks**: Type in the input field and press Enter or click Add
-2. **Complete Tasks**: Click the checkbox to mark tasks as done
-3. **Delete Tasks**: Click the X button to remove tasks
-4. **Persistence**: Tasks are automatically saved and restored
+2. **Set Category & Priority**: Choose from Work/Personal/Health/Other categories and Low/Medium/High priority levels
+3. **Complete Tasks**: Click the checkbox to mark tasks as done
+4. **Filter Tasks**: Use the filter buttons (All, Active, Completed) to view specific task types
+5. **Filter by Category**: Use the category dropdown to show tasks from specific categories
+6. **Delete Tasks**: Click the X button to remove tasks
+7. **View Statistics**: See live counts of active, completed, and total tasks
+8. **Persistence**: Tasks, categories, and priorities are automatically saved and restored
 
 ### Theme Switching
 - Click the sun/moon icon in the navbar to toggle between light and dark modes
 - Theme preference is saved and persists across sessions
+
+### Fullscreen Mode
+- Click the expand icon in the navbar to enter fullscreen mode for distraction-free focus
+- Click the minimize icon to exit fullscreen mode
+- Fullscreen mode provides an immersive experience for deep work sessions
 
 ## 🔧 Development
 
@@ -160,12 +187,23 @@ The app uses client-side APIs and doesn't require additional environment variabl
 - Safari 14+
 - Edge 90+
 
-## 📱 Responsive Design
+## 🔍 SEO & Performance
 
-Focus Flow is fully responsive and works seamlessly across:
-- Desktop computers
-- Tablets
-- Mobile devices
+Focus Flow is optimized for search engines and performance:
+
+### Search Engine Optimization
+- **Comprehensive Meta Tags**: Open Graph, Twitter Cards, and structured data
+- **Semantic HTML**: Proper heading hierarchy and accessibility features
+- **Sitemap & Robots.txt**: Automated crawling and indexing
+- **JSON-LD Structured Data**: Rich snippets for search results
+- **PWA Manifest**: Installable web app capabilities
+
+### Performance Features
+- **Next.js App Router**: Optimized routing and code splitting
+- **Server-Side Rendering**: Fast initial page loads
+- **Image Optimization**: Automatic image optimization with Next.js
+- **Lazy Loading**: Components load as needed
+- **Caching Strategies**: Efficient data persistence and state management
 
 ## 🤝 Contributing
 

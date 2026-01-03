@@ -235,26 +235,40 @@ export default function MusicPlayer({ isVisible, onClose }: MusicPlayerProps) {
                                             className="w-10 h-10 bg-gray-500 hover:bg-gray-600 text-white rounded-full flex items-center justify-center transition-colors"
                                             title="Previous Track"
                                         >
-                                            ⏮️
+                                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
+                                            </svg>
                                         </button>
                                         <button
                                             onClick={togglePlay}
                                             className="w-12 h-12 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center transition-colors"
                                         >
-                                            {isPlaying ? '⏸️' : '▶️'}
+                                            {isPlaying ? (
+                                                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path d="M6 4h4v16H6V4zM14 4h4v16h-4V4z"/>
+                                                </svg>
+                                            ) : (
+                                                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path d="M8 5v14l11-7z"/>
+                                                </svg>
+                                            )}
                                         </button>
                                         <button
                                             onClick={stopMusic}
                                             className="w-12 h-12 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center transition-colors"
                                         >
-                                            ⏹️
+                                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M6 6h12v12H6z"/>
+                                            </svg>
                                         </button>
                                         <button
                                             onClick={nextTrack}
                                             className="w-10 h-10 bg-gray-500 hover:bg-gray-600 text-white rounded-full flex items-center justify-center transition-colors"
                                             title="Next Track"
                                         >
-                                            ⏪
+                                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
+                                            </svg>
                                         </button>
                                     </div>
 
@@ -296,33 +310,63 @@ export default function MusicPlayer({ isVisible, onClose }: MusicPlayerProps) {
                                         className="w-8 h-8 bg-gray-500 hover:bg-gray-600 text-white rounded flex items-center justify-center transition-colors text-sm"
                                         title="Previous Track"
                                     >
-                                        ⏮️
+                                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
+                                        </svg>
                                     </button>
                                     <button
                                         onClick={togglePlay}
                                         className="w-8 h-8 bg-blue-500 hover:bg-blue-600 text-white rounded flex items-center justify-center transition-colors text-sm"
                                         title={isPlaying ? 'Pause' : 'Play'}
                                     >
-                                        {isPlaying ? '⏸️' : '▶️'}
+                                        {isPlaying ? (
+                                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M6 4h4v16H6V4zM14 4h4v16h-4V4z"/>
+                                            </svg>
+                                        ) : (
+                                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M8 5v14l11-7z"/>
+                                            </svg>
+                                        )}
                                     </button>
                                     <button
                                         onClick={stopMusic}
                                         className="w-8 h-8 bg-red-500 hover:bg-red-600 text-white rounded flex items-center justify-center transition-colors text-sm"
                                         title="Stop"
                                     >
-                                        ⏹️
+                                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M6 6h12v12H6z"/>
+                                        </svg>
                                     </button>
                                     <button
                                         onClick={nextTrack}
                                         className="w-8 h-8 bg-gray-500 hover:bg-gray-600 text-white rounded flex items-center justify-center transition-colors text-sm"
                                         title="Next Track"
                                     >
-                                        ⏪
+                                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
+                                        </svg>
                                     </button>
                                 </div>
                                 <div className="text-xs text-gray-600 dark:text-gray-400 min-w-0">
                                     <div className="font-medium">{tracks[currentTrack].title}</div>
-                                    <div>{isPlaying ? '🎵 Playing' : '⏸️ Paused'}</div>
+                                    <div className="flex items-center gap-1">
+                                        {isPlaying ? (
+                                            <>
+                                                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path d="M8 5v14l11-7z"/>
+                                                </svg>
+                                                Playing
+                                            </>
+                                        ) : (
+                                            <>
+                                                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path d="M6 4h4v16H6V4zM14 4h4v16h-4V4z"/>
+                                                </svg>
+                                                Paused
+                                            </>
+                                        )}
+                                    </div>
                                 </div>
                                 <button
                                     onClick={toggleMinimize}
